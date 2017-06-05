@@ -28,9 +28,14 @@ lemma_332 :: Set a -> Set a -> Set a -> Proof
               -> { (isSubsetOf a (intersection b c)) => (isSubsetOf a (union b c)) } @-} 
 lemma_332 _ _ _ = trivial 
 
+
+-- forall xs. (exists ys. xs == ys ++ ys)
+-- => 
+-- exists n. (lenght xs == n + n)
+
 lemma_fastforce :: List a -> (List a, Proof) -> (Int, Proof)
 {-@ lemma_fastforce :: xs:List a -> (ys::List a, {v:Proof | xs == ys ++ ys })
-              -> (Int, Proof)<\n -> {v:Proof | length xs == n + n}> @-}
+              -> (n::Int, {v:Proof | length xs == n + n}) @-}
 lemma_fastforce xs (ys,pf) = (length ys, lenAppend ys ys &&& pf)
 
 
