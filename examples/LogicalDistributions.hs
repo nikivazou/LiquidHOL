@@ -37,12 +37,17 @@ ex2 f fx = (y, fx y)
 
 
 -- Existential Elimination 
+-- exists x. (f x && g x)
+-- => 
+-- exists x. f x && exists x. g x 
 {-@ existsAllDistr :: f:(a -> Bool) -> g:(a -> Bool) -> (x::a, PAnd {v:Proof | f x} {v:Proof | g x})
     -> PAnd (x::a, {v:Proof | f x}) (x::a, {v:Proof | g x}) @-}
 existsAllDistr :: (a -> Bool) -> (a -> Bool) -> (a,PAnd Proof Proof) -> PAnd (a,Proof) (a,Proof)
 existsAllDistr f g (x,PAnd fx gx) = PAnd (x,fx) (x,gx)
 
-
+-- exists x. (f x || g x)
+-- => 
+-- (exists x. f x) || (exists x. g x)
 {-@ existsOrDistr :: f:(a -> Bool) -> g:(a -> Bool) -> (x::a, POr {v:Proof | f x} {v:Proof | g x})
     -> POr (x::a, {v:Proof | f x}) (x::a, {v:Proof | g x}) @-}
 existsOrDistr :: (a -> Bool) -> (a -> Bool) -> (a,POr Proof Proof) -> POr (a,Proof) (a,Proof)
@@ -50,6 +55,9 @@ existsOrDistr f g (x,POrLeft fx)  = POrLeft  (x,fx)
 existsOrDistr f g (x,POrRight fx) = POrRight (x,fx) 
 
 
+-- forall x. (f x && g x)
+-- => 
+-- (forall x. f x && forall x g x)
 {-@ forallAndDistr :: f:(a -> Bool) -> g:(a -> Bool) -> (x:a -> PAnd {v:Proof | f x} {v:Proof | g x})
     -> PAnd (x:a -> {v:Proof | f x}) (x:a -> {v:Proof | g x}) @-}
 forallAndDistr :: (a -> Bool) -> (a -> Bool) -> (a -> PAnd Proof Proof) -> PAnd (a -> Proof) (a -> Proof)
@@ -58,6 +66,9 @@ forallAndDistr f g andx
          (\x -> case andx x of PAnd _ gx -> gx)
 
 
+-- forall x. (exists y. (p x => q x y)) 
+-- => 
+-- forall x. (p x => exists y. q x y)
 {-@ forallExistsImpl :: p:(a -> Bool) -> q:(a -> a -> Bool)
   -> (x:a -> (y::a, {v:Proof | p x} -> {v:Proof | q x y} ))
   -> (x:a -> ({v:Proof | p x} -> (y::a, {v:Proof | q x y})))@-}
